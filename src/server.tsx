@@ -1,7 +1,7 @@
 import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { StaticRouterContext } from "react-router";
+// import { StaticRouterContext } from "react-router";
 import { StaticRouter } from 'react-router-dom/server';
 
 import App from './App';
@@ -28,17 +28,17 @@ const jsScriptTagsFromAssets = (assets, entrypoint, extra = '') => {
 };
 
 export const renderApp = (req: express.Request, res: express.Response) => {
-  const context: StaticRouterContext = {};
+  // const context: StaticRouterContext = {};
 
   const markup = renderToString(
-    <StaticRouter context={context} location={req.url}>
+    <StaticRouter location={req.url}>
       <App />
     </StaticRouter>
   );
 
-  if (context.url) {
-    return { redirect: context.url };
-  } else {
+  // if (context.url) {
+  //   return { redirect: context.url };
+  // } else {
     const html =
       // prettier-ignore
       `<!doctype html>
@@ -57,19 +57,15 @@ export const renderApp = (req: express.Request, res: express.Response) => {
   </html>`;
 
     return { html };
-  }
+  //}
 };
 
 const server = express()
   .disable('x-powered-by')
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR!))
   .get('/*', (req: express.Request, res: express.Response) => {
-    const { html = '', redirect = false } = renderApp(req, res);
-    if (redirect) {
-      res.redirect(redirect);
-    } else {
-      res.send(html);
-    }
+    const { html = '' } = renderApp(req, res);
+    res.send(html);
   });
 
 export default server;
